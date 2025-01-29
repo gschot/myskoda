@@ -27,6 +27,7 @@ def load_vehicle_info() -> list[str]:
         "enyaq/garage_vehicles_iv80.json",
         "enyaq/garage_vehicles_iv80_coupe.json",
         "superb/garage_vehicles_LK_liftback.json",
+        "superb/garage_with_429_error.json",
     ]:
         with FIXTURES_DIR.joinpath(path).open() as file:
             vehicle_infos.append(file.read())
@@ -96,6 +97,7 @@ def load_air_conditioning() -> list[str]:
     air_conditioning = []
     for path in [
         "enyaq/air-conditioning-heating.json",
+        "enyaq/air-conditioning-no-steering.json",
         "other/air-conditioning-idle.json",
         "superb/air-conditioning-aux-heater.json",
         "superb/air-conditioning-idle.json",
@@ -122,7 +124,8 @@ async def test_get_air_conditioning(
 
         assert get_status_result.state == air_conditioning_status_json["state"]
         assert (
-            get_status_result.window_heating_state.front
+            get_status_result.window_heating_state is None
+            or get_status_result.window_heating_state.front
             == air_conditioning_status_json["windowHeatingState"]["front"]
         )
 
@@ -291,7 +294,7 @@ async def test_get_spin_status(
 
 @pytest.fixture(name="departure_timers")
 def load_departure_timers() -> list[str]:
-    """Load charging fixture."""
+    """Load departure timers fixture."""
     departure_timers = []
     for path in [
         "other/departure-timers.json",

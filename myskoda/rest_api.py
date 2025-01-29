@@ -35,11 +35,12 @@ from .const import BASE_URL_SKODA, REQUEST_TIMEOUT_IN_SECONDS
 from .models.air_conditioning import (
     AirConditioning,
     AirConditioningAtUnlock,
+    AirConditioningTimer,
     AirConditioningWithoutExternalPower,
     SeatHeating,
     WindowHeating,
 )
-from .models.auxiliary_heating import AuxiliaryConfig, AuxiliaryHeating
+from .models.auxiliary_heating import AuxiliaryConfig, AuxiliaryHeating, AuxiliaryHeatingTimer
 from .models.charging import Charging
 from .models.departure import DepartureInfo, DepartureTimer
 from .models.driving_range import DrivingRange
@@ -581,6 +582,32 @@ class RestApi:
         json_data = {"deviceDateTime": datetime_str, "timers": [timer.to_dict()]}
         await self._make_post_request(
             url=f"/v1/vehicle-automatization/{vin}/departure/timers",
+            json=json_data,
+        )
+
+    async def set_ac_timer(self, vin: str, timer: AirConditioningTimer) -> None:
+        """Set air-conditioning timer."""
+        _LOGGER.debug(
+            "Setting air-conditioning timer #%i for vehicle %s to %r", timer.id, vin, timer.enabled
+        )
+
+        json_data = {"timers": [timer.to_dict(by_alias=True)]}
+        await self._make_post_request(
+            url=f"/v2/air-conditioning/{vin}/timers",
+            json=json_data,
+        )
+
+    async def set_auxiliary_heating_timer(
+        self, vin: str, timer: AuxiliaryHeatingTimer, spin: str
+    ) -> None:
+        """Set auxiliary heating timer."""
+        _LOGGER.debug(
+            "Setting auxiliary heating timer #%i for vehicle %s to %r", timer.id, vin, timer.enabled
+        )
+
+        json_data = {"spin": spin, "timers": [timer.to_dict(by_alias=True)]}
+        await self._make_post_request(
+            url=f"/v2/air-conditioning/{vin}/auxiliary-heating/timers",
             json=json_data,
         )
 

@@ -158,10 +158,10 @@
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/settings/ac-at-unlock                        |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/settings/seats-heating                       |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/settings/target-temperature                  |  ✅     |         |
-| EnergyX | POST   | api/v2/air-conditioning/{vin}/timers                                       |       |         |
+| EnergyX | POST   | api/v2/air-conditioning/{vin}/timers                                       |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/settings/windows-heating                     |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/settings/ac-without-external-power           |  ✅     |         |
-| EnergyX | POST   | api/v2/air-conditioning/{vin}/auxiliary-heating/timers                     |       |         |
+| EnergyX | POST   | api/v2/air-conditioning/{vin}/auxiliary-heating/timers                     |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/active-ventilation/start                     |       |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/start                                        |  ✅     |         |
 | EnergyX | POST   | api/v2/air-conditioning/{vin}/auxiliary-heating/start                      |  ✅     |         |

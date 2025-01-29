@@ -120,6 +120,7 @@ reports:
         statuses: []
       - id: CARE_AND_INSURANCE
         statuses: []
+      errors: null 
     composite_renders:
     - layers:
       - order: 0
@@ -291,7 +292,7 @@ reports:
       id: 1
       selected_days:
       - THURSDAY
-      time: 06:00:00
+      time: 06:00
       type: ONE_OFF
     - enabled: false
       id: 2
@@ -303,7 +304,7 @@ reports:
       - FRIDAY
       - SATURDAY
       - SUNDAY
-      time: '12:30:00'
+      time: '12:30'
       type: RECURRING
     - enabled: false
       id: 3
@@ -315,7 +316,7 @@ reports:
       - FRIDAY
       - SATURDAY
       - SUNDAY
-      time: 00:00:00
+      time: 00:00
       type: RECURRING
     window_heating_enabled: null
     window_heating_state:

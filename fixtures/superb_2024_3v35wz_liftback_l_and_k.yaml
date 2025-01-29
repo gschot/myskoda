@@ -255,6 +255,7 @@ reports:
             statuses: []
           - id: AUXILIARY_HEATING_BASIC
             statuses: []
+        errors: null 
       renders:
         - url: >-
             https://iprenders.blob.core.windows.net/base3v3v23200002/0F0FWBQ-6-RemtP8.jqZy0-ZqEczfhG_n50.tUwX-CWwFuhHKJkNPz40df893ms-Has5qeWchF.UzAl13y8jCtnK-CKFEIA-19201080dayvext_front1080.png
@@ -433,19 +434,19 @@ reports:
       timers:
         - enabled: false
           id: 1
-          time: '21:00:00'
+          time: '21:00'
           type: ONE_OFF
           selected_days:
             - MONDAY
         - enabled: false
           id: 2
-          time: '00:00:00'
+          time: '00:00'
           type: ONE_OFF
           selected_days:
             - SATURDAY
         - enabled: false
           id: 3
-          time: '00:00:00'
+          time: '00:00'
           type: ONE_OFF
           selected_days:
             - SATURDAY
@@ -491,19 +492,19 @@ reports:
       timers:
         - enabled: false
           id: 1
-          time: '21:00:00'
+          time: '21:00'
           type: ONE_OFF
           selected_days:
             - MONDAY
         - enabled: false
           id: 2
-          time: '00:00:00'
+          time: '00:00'
           type: ONE_OFF
           selected_days:
             - SATURDAY
         - enabled: false
           id: 3
-          time: '00:00:00'
+          time: '00:00'
           type: ONE_OFF
           selected_days:
             - SATURDAY

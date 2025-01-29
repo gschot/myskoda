@@ -9,6 +9,7 @@ from amqtt.client import QOS_2, MQTTClient
 from myskoda.anonymize import ACCESS_TOKEN, LOCATION, USER_ID, VIN
 from myskoda.const import BASE_URL_SKODA
 from myskoda.models.air_conditioning import (
+    AirConditioning,
     AirConditioningAtUnlock,
     AirConditioningWithoutExternalPower,
     HeaterSource,
@@ -16,7 +17,7 @@ from myskoda.models.air_conditioning import (
     TargetTemperature,
     WindowHeating,
 )
-from myskoda.models.auxiliary_heating import AuxiliaryConfig, AuxiliaryStartMode
+from myskoda.models.auxiliary_heating import AuxiliaryConfig, AuxiliaryHeating, AuxiliaryStartMode
 from myskoda.models.charging import ChargeMode
 from myskoda.models.departure import DepartureInfo
 from myskoda.myskoda import MySkoda
@@ -583,7 +584,7 @@ async def test_set_ac_at_unlock(
 
     future = myskoda.set_ac_at_unlock(VIN, settings)
 
-    topic = f"{USER_ID}/{VIN}/operation-request/" "air-conditioning/set-air-conditioning-at-unlock"
+    topic = f"{USER_ID}/{VIN}/operation-request/air-conditioning/set-air-conditioning-at-unlock"
     await mqtt_client.publish(topic, create_completed_json("set-air-conditioning-at-unlock"), QOS_2)
 
     await future
@@ -615,7 +616,7 @@ async def test_set_windows_heating(
 
     future = myskoda.set_windows_heating(VIN, settings)
 
-    topic = f"{USER_ID}/{VIN}/operation-request/" "air-conditioning/windows-heating"
+    topic = f"{USER_ID}/{VIN}/operation-request/air-conditioning/windows-heating"
     await mqtt_client.publish(topic, create_completed_json("windows-heating"), QOS_2)
 
     await future
@@ -648,9 +649,7 @@ async def test_set_seats_heating(
 
     future = myskoda.set_seats_heating(VIN, settings)
 
-    topic = (
-        f"{USER_ID}/{VIN}/operation-request/" "air-conditioning/set-air-conditioning-seats-heating"
-    )
+    topic = f"{USER_ID}/{VIN}/operation-request/air-conditioning/set-air-conditioning-seats-heating"
     await mqtt_client.publish(
         topic, create_completed_json("set-air-conditioning-seats-heating"), QOS_2
     )
@@ -706,3 +705,78 @@ async def test_set_departure_timer(
         assert body is not None
         # check only the timer as deviceDateTime can't be verified
         assert body["timers"][0] == selected_timer.to_dict()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("timer_id", "enabled"), [(1, True), (2, False)])
+async def test_set_ac_timer(
+    responses: aioresponses, mqtt_client: MQTTClient, myskoda: MySkoda, timer_id: int, enabled: bool
+) -> None:
+    url = f"{BASE_URL_SKODA}/api/v2/air-conditioning/{VIN}/timers"
+    responses.post(url=url)
+
+    ac_info_json = FIXTURES_DIR.joinpath("other/air-conditioning-idle.json").read_text()
+    ac_info = AirConditioning.from_json(ac_info_json)
+
+    selected_timer = (
+        next((timer for timer in ac_info.timers if timer.id == timer_id), None)
+        if ac_info.timers
+        else None
+    )
+    assert selected_timer is not None
+
+    selected_timer.enabled = enabled
+    future = myskoda.set_ac_timer(VIN, selected_timer)
+
+    topic = f"{USER_ID}/{VIN}/operation-request/air-conditioning/set-air-conditioning-timers"
+    await mqtt_client.publish(topic, create_completed_json("set-air-conditioning-timers"), QOS_2)
+
+    json_data = {"timers": [selected_timer.to_dict(by_alias=True)]}
+
+    await future
+    responses.assert_called_with(
+        url=url,
+        method="POST",
+        headers={"authorization": f"Bearer {ACCESS_TOKEN}"},
+        json=json_data,
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("timer_id", "enabled", "spin"), [(1, True, "1234"), (2, False, "4321")])
+async def test_set_auxiliary_heating_timer(  # noqa: PLR0913
+    responses: aioresponses,
+    mqtt_client: MQTTClient,
+    myskoda: MySkoda,
+    timer_id: int,
+    enabled: bool,
+    spin: str,
+) -> None:
+    url = f"{BASE_URL_SKODA}/api/v2/air-conditioning/{VIN}/auxiliary-heating/timers"
+    responses.post(url=url)
+
+    aux_info_json = FIXTURES_DIR.joinpath("other/auxiliary-heating-idle.json").read_text()
+    aux_info = AuxiliaryHeating.from_json(aux_info_json)
+
+    selected_timer = (
+        next((timer for timer in aux_info.timers if timer.id == timer_id), None)
+        if aux_info.timers
+        else None
+    )
+    assert selected_timer is not None
+
+    selected_timer.enabled = enabled
+    future = myskoda.set_auxiliary_heating_timer(VIN, selected_timer, spin)
+
+    topic = f"{USER_ID}/{VIN}/operation-request/air-conditioning/set-air-conditioning-timers"
+    await mqtt_client.publish(topic, create_completed_json("set-air-conditioning-timers"), QOS_2)
+
+    json_data = {"spin": spin, "timers": [selected_timer.to_dict(by_alias=True)]}
+
+    await future
+    responses.assert_called_with(
+        url=url,
+        method="POST",
+        headers={"authorization": f"Bearer {ACCESS_TOKEN}"},
+        json=json_data,
+    )
